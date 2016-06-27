@@ -32,6 +32,9 @@ $fno2name=array(
 /*13*/   'cpu',
 /*14*/   'ram',
 /*15*/   'hd',
+/*16*/   'sn2',		
+/*17*/   'macs',	
+/*18*/   'purchasedate',
 );
 
 $name2fno=array_flip($fno2name);
@@ -131,13 +134,7 @@ Expected format is CSV file with the following fields:<br>
 
 		$cols=explode($delim,$line);
 		if (count($cols) != $nfields) {
-			echo "<b><big style='color:red'>Error: field count in line $line_num is ".count($cols).", $nfields is expected</big></b>";
-			$nextstep=0;
-			break;
-		}
-
-		if (strlen(trim($cols[$name2fno['owner']]))<1) {
-			echo "<b><big style='color:red'>Error: no owner specified in line $line_num</big></b>";
+			echo "<b><big>Error: field count in line $line_num is ".count($cols).", $nfields is expected</big></b>";
 			$nextstep=0;
 			break;
 		}
@@ -386,6 +383,15 @@ if ($nextstep==2) {
 		$manufacturerid=getagentidbyname($cols[$name2fno['manufacturer']]);
 		$model=trim($cols[$name2fno['model']]);
 		$sn=trim($cols[$name2fno['sn']]);
+		$sn2=trim($cols[$name2fno['sn2']]);					
+		$macs=trim($cols[$name2fno['macs']]);					
+		$purchasedate=trim($cols[$name2fno['purchasedate']]);			
+		if(strlen($purchasedate)>1)						
+		{														#aenderung
+			$arrDate = explode("-",$purchasedate);				
+			$timestamp = mktime(02,00,00,$arrDate[1],$arrDate[2],$arrDate[0]);
+			$purchasedate = $timestamp;					
+		}														#aenderung
         $ispart=0;
         $rackmountable=0;
 		$itemtypeid=getitemtypeidbyname($cols[$name2fno['itemtype']]);
@@ -399,9 +405,9 @@ if ($nextstep==2) {
 
 
 		$sql="INSERT into items ".
-             "(userid,ipv4,dnsname,comments,manufacturerid,model,sn,ispart,rackmountable,itemtypeid,status,locationid,locareaid,label,function) ".
+             "(userid,ipv4,dnsname,comments,manufacturerid,model,sn,ispart,rackmountable,itemtypeid,status,locationid,locareaid,label,function,sn2, macs, purchasedate) ". 
              " VALUES ".
-             "(:userid,:ipv4,:dnsname,:comments,:manufacturerid,:model,:sn,:ispart,:rackmountable,:itemtypeid,:status,:locationid,:locareaid,:label,:function)";
+             "(:userid,:ipv4,:dnsname,:comments,:manufacturerid,:model,:sn,:ispart,:rackmountable,:itemtypeid,:status,:locationid,:locareaid,:label,:function,:sn2,:macs,:purchasedate )"; #aenderung
 
         $stmt=db_execute2($dbh,$sql,
             array(
@@ -416,13 +422,16 @@ if ($nextstep==2) {
             'rackmountable'=>$rackmountable,
             'itemtypeid'=>$itemtypeid,
             'status'=>$status,
-            'locationid'=>$locationid,
+            'locationid'=>$locid,					#korrektur
             'locareaid'=>$locareaid,
             'label'=>$label,
             'function'=>$function,
+	    'sn2'=>$sn2,			
+	    'macs'=>$macs,			
+	    'purchasedate'=>$purchasedate,	
             )
         );
-		 echo "<br>Isql=$sql<br>";
+		 //echo "<br>Isql=$sql<br>";
 	}
 
 	echo "\n<br><h2>Finished.</h2>\n";
