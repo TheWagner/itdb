@@ -274,8 +274,10 @@ else
 <td>
 <?php 
 if (strlen($r['floorplanfn'])) {?>
-<img width=600 src='<?php  echo $fuploaddirwww.$r['floorplanfn']; ?>'>
-<?php  }?>
+<a href='<?php  echo $fuploaddirwww.$r['floorplanfn']; ?>' target=_blank title='<?php echo t("Floor Plan")?>' >
+	<img width=600 src='<?php  echo $fuploaddirwww.$r['floorplanfn']; ?>' alt='<?php echo t("Floor Plan")?>'>
+</a>
+<?php  } #Aenderung in der if?>
 
 </td>
 
